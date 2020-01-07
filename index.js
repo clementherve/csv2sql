@@ -16,7 +16,7 @@ const csvtojson = require('csvtojson');
 const fs = require('fs');
 const path = require('path');
 // Parse the filename for the tablename
-const tablename = path.basename(csvfile,'.csv').replace(/-/g, "_");
+const tablename = path.basename(csvfile,'.csv').replace(/[\s-]+/g, "_");
 
 // Log the arguments
 console.log('csvfile: '+csvfile+' dbschema: '+dbschema+' tablename: '+tablename);
@@ -51,7 +51,7 @@ csvtojson()
       }
       // comma seperated list of single quoted values (escape single quotes with two single quotes)
       for (var k = 0; k < keys.length; k++) {
-        var colValue = obj[keys[k]].replace("'", "''");
+        var colValue = obj[keys[k]].replace(new RegExp("'", "g"), "''");
         if (k === 0) {
           fs.appendFileSync("./inserts.sql", "'" + colValue + "'");
         } else {

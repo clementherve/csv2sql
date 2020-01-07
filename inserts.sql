@@ -16,7 +16,7 @@ id int not null AUTO_INCREMENT
 );insert into mysql_schema.data_classes (first_name,surname,gender,email,latitude,longitude,ip_address,city,country,language) 
  values 
 ('Suzi','Wentzell','Female','Suzi.Wentzell@gmail.com','-21.67851476','137.8567438','468.704.782.288','Cali','Colombia','Vietnamese')
-,('Bok','Mcglade','Female','Bok.Mcglade@gmail.com','-22.25135677','138.5498918','862.651.219.841','Hiroshima','Japan','Tok Pisin')
+,('Bok','Mcglade''s and Mcglade''s ''B''','Female','Bok.Mcglade@gmail.com','-22.25135677','138.5498918','862.651.219.841','Hiroshima','Japan','Tok Pisin')
 ,('Teodora','Worden','Female','Teodora.Worden@outlook.com','-22.76737732','140.7202675','448.111.274.821','Paris','France','French')
 ,('Thelma','Hornberger','Female','Thelma.Hornberger@outlook.com','-23.85862851','140.2765583','261.87.118.517','Davao City','Philippines','Filipino')
 ,('Kristan','Bontrager','Female','Kristan.Bontrager@gmail.com','-24.52434517','139.5108449','168.693.358.307','Hanoi','Vietnam','Mongolian')
