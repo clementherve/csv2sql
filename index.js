@@ -17,6 +17,7 @@ const fs = require('fs');
 const path = require('path');
 // Parse the filename for the tablename
 const tablename = path.basename(csvfile,'.csv').replace(/[\s-]+/g, "_");
+const sqlScript = "./"+tablename+".sql";
 
 // Log the arguments
 console.log('csvfile: '+csvfile+' dbschema: '+dbschema+' tablename: '+tablename);
@@ -29,38 +30,38 @@ csvtojson()
     var keys = Object.keys(jsonArrayObj[0]);
 
     dropCreate = generateDDL(keys);
-    fs.writeFileSync("./inserts.sql", dropCreate);
+    fs.writeFileSync(sqlScript, dropCreate);
 
     // Generate the list of columns in the insert statement
-    fs.appendFileSync("./inserts.sql", "insert into "+dbschema+"."+tablename+" (");
+    fs.appendFileSync(sqlScript, "insert into "+dbschema+"."+tablename+" (");
     for (var j = 0; j < keys.length; j++) {
       if (j === 0) {
-        fs.appendFileSync("./inserts.sql", keys[j]);
+        fs.appendFileSync(sqlScript, keys[j]);
       } else {
-        fs.appendFileSync("./inserts.sql", ',' + keys[j]);
+        fs.appendFileSync(sqlScript, ',' + keys[j]);
       }
     }
-    fs.appendFileSync("./inserts.sql", ") \n values ");
+    fs.appendFileSync(sqlScript, ") \n values ");
     // Generate the values in the insert statement
     for (var i = 0; i < jsonArrayObj.length; i++) {
       var obj = jsonArrayObj[i];
       if (i === 0) {
-        fs.appendFileSync("./inserts.sql", '\n(')
+        fs.appendFileSync(sqlScript, '\n(')
       } else {
-        fs.appendFileSync("./inserts.sql", '\n,(')
+        fs.appendFileSync(sqlScript, '\n,(')
       }
       // comma seperated list of single quoted values (escape single quotes with two single quotes)
       for (var k = 0; k < keys.length; k++) {
         var colValue = obj[keys[k]].replace(new RegExp("'", "g"), "''");
         if (k === 0) {
-          fs.appendFileSync("./inserts.sql", "'" + colValue + "'");
+          fs.appendFileSync(sqlScript, "'" + colValue + "'");
         } else {
-          fs.appendFileSync("./inserts.sql", "," + "'" + colValue + "'");
+          fs.appendFileSync(sqlScript, "," + "'" + colValue + "'");
         }
       }
-      fs.appendFileSync("./inserts.sql", ')')
+      fs.appendFileSync(sqlScript, ')')
     }
-    fs.appendFileSync("./inserts.sql", "; ");
+    fs.appendFileSync(sqlScript, "; ");
   })
 
 function generateDDL(keys) {
