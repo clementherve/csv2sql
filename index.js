@@ -49,11 +49,13 @@ csvtojson()
       } else {
         fs.appendFileSync("./inserts.sql", '\n,(')
       }
+      // comma seperated list of single quoted values (escape single quotes with two single quotes)
       for (var k = 0; k < keys.length; k++) {
+        var colValue = obj[keys[k]].replace("'", "''");
         if (k === 0) {
-          fs.appendFileSync("./inserts.sql", "'" + obj[keys[k]] + "'");
+          fs.appendFileSync("./inserts.sql", "'" + colValue + "'");
         } else {
-          fs.appendFileSync("./inserts.sql", "," + "'" + obj[keys[k]] + "'");
+          fs.appendFileSync("./inserts.sql", "," + "'" + colValue + "'");
         }
       }
       fs.appendFileSync("./inserts.sql", ')')
