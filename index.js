@@ -7,12 +7,19 @@
 // Usage:   ./index.js csvfile dbschema
 // Example: ./index.js ./data-classes.csv mysql_schema
 
+// Process arguments
 const csvfile = process.argv[2];
 const dbschema = process.argv[3];
-console.log('csvfile: '+csvfile+' dbschema: '+dbschema);
 
+// Require packages
 const csvtojson = require('csvtojson');
 const fs = require('fs');
+const path = require('path');
+// Parse the filename for the tablename
+const tablename = path.basename(csvfile,'.csv').replace(/-/g, "_");
+
+// Log the arguments
+console.log('csvfile: '+csvfile+' dbschema: '+dbschema+' tablename: '+tablename);
 
 // Convert a csv file with csvtojson
 csvtojson()
@@ -25,7 +32,7 @@ csvtojson()
     fs.writeFileSync("./inserts.sql", dropCreate);
 
     // Generate the list of columns in the insert statement
-    fs.appendFileSync("./inserts.sql", "insert into "+dbschema+".data_classes (");
+    fs.appendFileSync("./inserts.sql", "insert into "+dbschema+"."+tablename+" (");
     for (var j = 0; j < keys.length; j++) {
       if (j === 0) {
         fs.appendFileSync("./inserts.sql", keys[j]);
@@ -60,8 +67,8 @@ function generateDDL(keys) {
   const primaryKeyDefinition = ', PRIMARY KEY (id)';
     ;
   // Drop create statement
-  const dropStatement = "drop table if exists "+dbschema+".data_classes;";
-  const createHeader = "create table "+dbschema+".data_classes (";
+  const dropStatement = "drop table if exists "+dbschema+"."+tablename+";";
+  const createHeader = "create table "+dbschema+"."+tablename+" (";
   const createFooter = ');';
   var colDef = '';
   for (var j = 0; j < keys.length; j++) {
