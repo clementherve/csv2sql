@@ -1,0 +1,23 @@
+{
+  "name": "csv-to-sql-js",
+  "version": "1.0.0",
+  "description": "Create a SQL table from CSV using Node.js script",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mortie23/csv-to-sql-js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mortie23/csv-to-sql-js/issues"
+  },
+  "homepage": "https://github.com/mortie23/csv-to-sql-js#readme",
+  "dependencies": {
+    "csvtojson": "^2.0.10",
+    "fs": "0.0.1-security"
+  }
+}
