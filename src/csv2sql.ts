@@ -9,7 +9,8 @@ type columsUntyped = {
 
 module.exports = (filename: string, schema: string | undefined) => {
   const tablename = path.basename(filename,'.csv').replace(/[\s-]+/g, "_");
-  const outputFile = `./${tablename}.sql`;
+  const outputDirectory = path.dirname(filename);
+  const outputFile = `${outputDirectory}/${tablename}.sql`;
   const shouldInferSchema = schema == undefined; 
 
   csvToJSON({
@@ -25,15 +26,12 @@ module.exports = (filename: string, schema: string | undefined) => {
       // order values by column name
       const columns: columsUntyped = json.reduce((prev: any, curr: any) => {
         Object.keys(curr).forEach((key: string) => {
-          if (key in prev) {
-            prev[key] = [...prev[key], curr[key]];
-          } else {
-            prev[key] = [curr[key]];
-          }
+          prev[key] = [...(prev[key] ?? [curr[key]]), curr[key]];
         });
-        
         return prev;
       }, {});
+
+      console.log(columns);
 
       fs.writeFileSync(outputFile,  tableCreation(tablename, header, columns));
 
@@ -42,7 +40,7 @@ module.exports = (filename: string, schema: string | undefined) => {
       
       // TODO
 
-      fs.appendFileSync(outputFile, "; ");
+      fs.appendFileSync(outputFile, "\n);");
   //     // for (let j = 0; j < keys.length; j++) {
   //     //   if (j === 0) {
   //     //     fs.appendFileSync(outputFile, keys[j]);
@@ -110,8 +108,6 @@ const inferTypeFromData = (columns: columsUntyped): columnsType => {
     });
   })
 
-  console.log(types);
-  
   return types;
 }
 
