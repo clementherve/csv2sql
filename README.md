@@ -3,22 +3,16 @@ Create a MySQL table from any CSV using Node.js script.
 
 ## Setup
 
-1. From a linux shell terminal install node and npm.  
-<https://tecadmin.net/install-latest-nodejs-npm-on-ubuntu/>
-
-2. Clone repo and install the required packages.  
-
 ```shell
-git clone git@github.com:mortie23/csv-to-sql-js.git
-npm init
-npm install csvtojson@latest --save
-npm install fs@latest --save
+git clone https://github.com/clementherve/csv-to-sql-js.git
+npm i
+npx tsc ./src/csv2sql.js
 ```
 
 ## Usage
 
-1. Run the following command and the `inserts.sql` file should be generated.
+1. Run the following command and the `file.sql` file should be generated.
 
 ```shell
-./index.js data-classes.csv myschema
+npm index.js <csv file> [sql table creation file]
 ```
