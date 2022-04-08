@@ -20,8 +20,9 @@ module.exports = (filename: string, schema: string | undefined) => {
     quote: undefined,
   })
     .fromFile(filename)
-    .then((json: object[]) => {
+    .then((json: any[]) => {
       const header = Object.keys(json[0]);
+      
       
       // order values by column name
       const columns: columsUntyped = json.reduce((prev: any, curr: any) => {
@@ -31,52 +32,53 @@ module.exports = (filename: string, schema: string | undefined) => {
         return prev;
       }, {});
 
-      console.log(columns);
-
       fs.writeFileSync(outputFile,  tableCreation(tablename, header, columns));
 
       // Generate the list of columns in the insert statement
-      fs.appendFileSync(outputFile, `insert into '${tablename}' (`);
+      fs.appendFileSync(outputFile, `insert into '${tablename}' \n`);
+      fs.appendFileSync(outputFile, `${generateHeader(header)}`);
+      fs.appendFileSync(outputFile, `values\n`);
       
-      // TODO
-
-      fs.appendFileSync(outputFile, "\n);");
-  //     // for (let j = 0; j < keys.length; j++) {
-  //     //   if (j === 0) {
-  //     //     fs.appendFileSync(outputFile, keys[j]);
-  //     //   } else {
-  //     //     fs.appendFileSync(outputFile, ',' + keys[j]);
-  //     //   }
-  //     // }
-  //     // fs.appendFileSync(outputFile, ") \n values ");
-  //     // // Generate the values in the insert statement
-  //     // for (let i = 0; i < jsonArrayObj.length; i++) {
-  //     //   var obj = jsonArrayObj[i];
-  //     //   if (i === 0) {
-  //     //     fs.appendFileSync(outputFile, '\n(')
-  //     //   } else {
-  //     //     fs.appendFileSync(outputFile, '\n,(')
-  //     //   }
-  //     //   // comma seperated list of single quoted values (escape single quotes with two single quotes)
-  //     //   for (var k = 0; k < keys.length; k++) {
-  //     //     var colValue = obj[keys[k]].replace(new RegExp("'", "g"), "''");
-  //     //     if (k === 0) {
-  //     //       fs.appendFileSync(outputFile, "'" + colValue + "'");
-  //     //     } else {
-  //     //       fs.appendFileSync(outputFile, "," + "'" + colValue + "'");
-  //     //     }
-  //     //   }
-  //     //   fs.appendFileSync(outputFile, ')')
-  //     // }
+      // generate the insert tuples
+      json.forEach((row: Map<string, any>, index: number) => {
+        // last row is different
+        const insert = (index == json.length - 1) ? generateTuple(row).slice(0, -2) + ';\n' : generateTuple(row);
+        fs.appendFileSync(outputFile, insert);
+      })
   })
+}
+
+/**
+ * Sanitize a string. Basically escapes the '.
+ * @param value A string to sanitize.
+ * @returns The same string, but with ' escaped with '\'.
+ */
+const sanitize = (value: string): string => {
+  return value.replace(new RegExp("'", "g"), "\\'");
+}
+
+/**
+ * Generate the header row for the SQL insertion.
+ * @param header the header values.
+ * @returns A tuple containing the header row, sanitized and formatted.
+ */
+const generateHeader = (header: string[]) => {
+  return `\t(${header.reduce((p, c) => `${p}'${sanitize(c)}', `, '').slice(0, -2)})\n`;
+}
+
+/**
+ * 
+ * @param row 
+ * @returns 
+ */
+const generateTuple = (row: Map<string, any>) => {
+  return `\t(${Object.values(row).reduce((p, c) => `${p}'${sanitize(c)}', `, '').slice(0, -2)}),\n`;
 }
 
 
 type columnsType = {
   [index: string]: string | undefined
 }
-
-
 /**
  * Infers SQL types based on values typing consistency across each column.
  * @param columns Values of each column, referenced by their column's name.
@@ -89,7 +91,6 @@ const inferTypeFromData = (columns: columsUntyped): columnsType => {
     'double': (value: any): boolean => strTypeOf(value) == 'double',
     'text': (value: any): boolean => strTypeOf(value) == 'string',
   }
-
   const types: columnsType = {};
 
   Object.keys(columns).forEach((colName: string, i: number): void => {
