@@ -5,9 +5,14 @@ type columsUntyped = {
   [index: string]: string[];
 };
 
-module.exports = async (csv: string, tablename: string, schema?: string): Promise<string> => {
-  // const outputDirectory = path.dirname(filename);
-  // const outputFile = `${outputDirectory}/${tablename}.sql`;
+/**
+ * Generates SQL from a CSV in input
+ * @param csv A string containing CSV.
+ * @param tablename The desired tablename.
+ * @param schema Optionnal: a prebuilt SQL creation table script (ex: "create table `a` (`b` int);").
+ * @returns 
+ */
+const csv2SQL = async (csv: string, tablename: string, schema?: string): Promise<string> => {
   const shouldInferSchema = schema == undefined;
 
   const json = await csvToJSON({
@@ -146,3 +151,5 @@ const tableCreation = (
 
   return `drop table if exists \`${tablename}\`; \ncreate table if not exists \`${tablename}\` (\n\t${createTable}\n); \n`;
 };
+
+module.exports = csv2SQL;

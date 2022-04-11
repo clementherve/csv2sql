@@ -40,8 +40,7 @@ test('mixed table', async () => {
     John; D'oe; true; 1987
     Alice; P'oe; false; 1989`;
 
-    const expectedSQL = `drop table if exists \`test\`; create table if not exists \`test\` (\`FirstName\` text, \`LastName\` text, \`hasGraduated\` tinyint, \`Year\` int); insert into \`test\` (\`FirstName\`, \`LastName\`, \`hasGraduated\`, \`Year\`) values ('\\'John\\'', 'D\\'oe', 1, 1987), ('\\'Alice\\'', 'P\\'oe', 
-    0, 1989);`;
+    const expectedSQL = `drop table if exists \`test\`; create table if not exists \`test\` (\`FirstName\` text, \`LastName\` text, \`hasGraduated\` tinyint, \`Year\` int); insert into \`test\` (\`FirstName\`, \`LastName\`, \`hasGraduated\`, \`Year\`) values ('John', 'D\\'oe', 1, 1987), ('Alice', 'P\\'oe', 0, 1989);`;
     const sql = (await csv2sql(csv, 'test')).replaceAll(/\n|\t/g, '');
     expect(sql).toBe(expectedSQL);
 });
