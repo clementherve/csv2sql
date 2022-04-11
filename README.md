@@ -1,5 +1,5 @@
-# csv-to-sql-js
-Create a MySQL table from any CSV using Node.js script.
+# CSV2SQL
+Create a MySQL table from any CSV using javascript.
 
 ## Setup
 
@@ -35,15 +35,15 @@ Will be transformed to:
 ```sql
 drop table if exists `example`; 
 create table if not exists `example` (
-	`A` int, 
-	`B` int, 
-	`C` int, 
-	`D` text
+	`A` int unique, 
+	`B` int not null, 
+	`C` int unique not null, 
+	`D` text not null
 ); 
 insert into `example` 
 	(`A`, `B`, `C`, `D`)
  values 
-	(0, 1, 2, 'hey'), 
-	(1, 1, 3, 'hoy'), 
+	(0, 1, 2, 'hoy'), 
+	(null, 1, 3, 'hoy'), 
 	(2, 2, 5, 'h\'ay');
 ```
