@@ -1,9 +1,13 @@
 
 const chalk = require('chalk');
 const csv2sql = require('./csv2sql');
-const Fs = require('fs');
+const fs = require("fs");
+const path = require("path");
 
 const csvFile: string = process.argv[2];
+const tablename = path.basename(csvFile,'.csv').replace(/[\s-]+/g, "_");
+const outputDirectory = path.dirname(csvFile);
+const outputFile = `${outputDirectory}/${tablename}.sql`;
 const DBSchema: string = process.argv[3];
 
 
@@ -19,7 +23,16 @@ if (!fs.existsSync(csvFile)) {
 }
 
 if (DBSchema == undefined) {
-  console.log(chalk.green('No table schema provided, will infer it from csv header...'));
+  console.log(chalk.yellow('No SQL table creation file provided, I will create it from CSV header...'));
 }
 
-csv2sql(csvFile, DBSchema);
+
+(async () => {
+  console.log(chalk.grey(`- Reading ${csvFile}...`));
+  const csv = fs.readFileSync(csvFile, 'utf-8');
+  const SQL = await csv2sql(csv, tablename, DBSchema);
+  
+  console.log(chalk.grey(`- Finished SQL generation`));
+  console.log(chalk.bgHex('#A3BE8C').white(`File: ${outputFile}`));
+  fs.writeFileSync(outputFile, SQL);
+})()
