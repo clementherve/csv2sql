@@ -10,9 +10,13 @@ type columsUntyped = {
  * @param csv A string containing CSV.
  * @param tablename The desired tablename.
  * @param schema Optionnal: a prebuilt SQL creation table script (ex: "create table `a` (`b` int);").
- * @returns 
+ * @returns
  */
-const csv2SQL = async (csv: string, tablename: string, schema?: string): Promise<string> => {
+const csv2SQL = async (
+  csv: string,
+  tablename: string,
+  schema?: string
+): Promise<string> => {
   const shouldInferSchema = schema == undefined;
 
   const json = await csvToJSON({
@@ -33,7 +37,10 @@ const csv2SQL = async (csv: string, tablename: string, schema?: string): Promise
   }, {});
 
   const columnTypes = inferTypeFromData(columns);
-  let query = tableCreation(tablename, header, columnTypes);
+  const columnUnique = inferUniqueness(columns);
+  const columnNullable = inferNullity(columns);
+
+  let query = tableCreation(tablename, header, columnTypes, columnUnique, columnNullable);
 
   // Generate the list of columns in the insert statement
   query += `insert into \`${tablename}\` \n${generateHeader(header)}values \n`;
@@ -56,8 +63,9 @@ const csv2SQL = async (csv: string, tablename: string, schema?: string): Promise
  * @param value A string to sanitize.
  * @returns The same string, but with ' escaped with '\'.
  */
-const sanitize = (value: string): string => {
-  return value.replace(new RegExp("'", "g"), "\\'");
+const sanitize = (value: string): string | null => {
+  const sanitized = value.replace(new RegExp("'", "g"), "\\'");
+  return sanitized != "" ? sanitized : null;
 };
 
 /**
@@ -72,19 +80,20 @@ const generateHeader = (header: string[]) => {
 };
 
 /**
- *
- * @param row
- * @returns
+ * Generates an insert tuple: (x, y, ...).
+ * @param row A row mapping a string with anything.
+ * @param columnsTypes The types of the columns.
+ * @returns an SQL insertion row.
  */
 const generateTuple = (row: Map<string, any>, columnsTypes: columnsType) => {
   const types = Object.values(columnsTypes);
 
   return `\t(${Object.values(row)
     .reduce((p: string, c: string, i: number) => {
-      if (types[i] === 'int' || types[i] === 'double') {
+      if (types[i] === "int" || types[i] === "double") {
         return `${p}${sanitize(c)}, `;
-      } else if (types[i] === 'tinyint') {
-        return `${p}${c.toLowerCase() === 'true' ? 1 : 0}, `;
+      } else if (types[i] === "tinyint") {
+        return `${p}${c.toLowerCase() === "true" ? 1 : 0}, `;
       } else {
         return `${p}'${sanitize(c)}', `;
       }
@@ -95,10 +104,18 @@ const generateTuple = (row: Map<string, any>, columnsTypes: columnsType) => {
 type columnsType = {
   [index: string]: string | undefined;
 };
+type columnsUnique = {
+  [index: string]: boolean;
+};
+
+type columnsNullable = {
+  [index: string]: boolean;
+};
+
 /**
  * Infers SQL types based on values typing consistency across each column.
  * @param columns Values of each column, referenced by their column's name.
- * @returns A type object, with keys being the name from the header, and the value being a valid SQL type.
+ * @returns A columnsType object, with keys being the name from the header, and the value being a valid SQL type.
  */
 const inferTypeFromData = (columns: columsUntyped): columnsType => {
   const typeGuess: { [index: string]: any } = {
@@ -117,17 +134,55 @@ const inferTypeFromData = (columns: columsUntyped): columnsType => {
     Object.keys(typeGuess).forEach((value: string, index: number): void => {
       const type: string = Object.keys(typeGuess)[index];
 
-      const isTypeConsistent: boolean = columns[colName].every(
-        (value: any): boolean => {
+      const isTypeConsistent: boolean = columns[colName]
+        .filter((value) => value != "")
+        .every((value: any): boolean => {
           return typeGuess[type](value);
-        }
-      );
+        });
 
       types[colName] = isTypeConsistent ? type : types[colName];
     });
   });
 
   return types;
+};
+
+/**
+ * Infers uniqueness for each column.
+ * @param columns Values of each column, referenced by their column's name.
+ * @returns A columnUnique object, with column names being keys referencing a boolean. true -> unique.
+ */
+const inferUniqueness = (columns: columsUntyped): columnsUnique => {
+  const unique: columnsUnique = {};
+  Object.keys(columns).map((collName: string) => {
+    const col = columns[collName].slice(1);
+    col.forEach((value: any, i: number) => {
+      if (unique[collName] != false || !(collName in unique)) {
+        unique[collName] = col.lastIndexOf(value) == col.indexOf(value);
+      }
+    });
+  });
+  return unique;
+};
+
+/**
+ * Infers the nullable aspect of a column.
+ * @param columns Values of each column, referenced by their column's name.
+ * @returns A columnsNullable object, with column names being keys referencing a boolean. true -> nullable.
+ */
+const inferNullity = (columns: columsUntyped): columnsNullable => {
+  const isNullable: columnsNullable = {};
+
+  Object.keys(columns).map((collName: string) => {
+    const col = columns[collName].slice(1);
+    col.forEach((value: any, i: number) => {
+      if (isNullable[collName] == false || !(collName in isNullable)) {
+        isNullable[collName] = value == '';
+      }
+    });
+  });
+  
+  return isNullable;
 };
 
 /**
@@ -140,12 +195,15 @@ const inferTypeFromData = (columns: columsUntyped): columnsType => {
 const tableCreation = (
   tablename: string,
   header: string[],
-  columnTypes: columnsType
+  columnTypes: columnsType,
+  unique: columnsUnique,
+  nullable: columnsNullable
 ) => {
-
   const createTable = header
     .reduce((prev: string, collName: string) => {
-      return `${prev}\`${collName}\` ${columnTypes[collName]}, \n\t`;
+      return `${prev}\`${collName}\` ${columnTypes[collName]}${
+        unique[collName] ? ' unique' : ''
+      }${nullable[collName] ? '' : ' not null'}, \n\t`;
     }, "")
     .slice(0, -4);
 
