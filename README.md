@@ -26,8 +26,8 @@ Run the following command and the SQL file should be generated.
 The following file: `./example/example.csv`
 ```csv
 A; B; C; D
-0; 1; 2; hey
-1; 1; 3; hoy
+0; 1; 2; hoy
+; 1; 3; hoy
 2; 2; 5; h'ay
 ```
 
