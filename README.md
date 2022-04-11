@@ -4,9 +4,14 @@ Create a MySQL table from any CSV using Node.js script.
 ## Setup
 
 ```bash
-git clone https://github.com/clementherve/csv-to-sql-js.git
-npm i
-npm run build
+    git clone https://github.com/clementherve/csv-to-sql-js.git
+    npm i
+    npm run build
+```
+
+### Testing
+```
+    npm run test
 ```
 
 ## Usage
@@ -14,5 +19,5 @@ npm run build
 Run the following command and the SQL file should be generated.
 
 ```bash
-node ./out/main.js <csv file> [sql table creation file]
+    node ./out/main.js <csv file> [sql table creation file]
 ```
