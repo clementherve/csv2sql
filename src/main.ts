@@ -1,7 +1,6 @@
-
-const chalk = require('chalk');
-const csv2sql = require('./csv2sql');
-const Fs = require('fs');
+import chalk from 'chalk'
+import fs from 'fs'
+import { csv2sql } from './csv2sql'
 
 const csvFile: string = process.argv[2];
 const DBSchema: string = process.argv[3];

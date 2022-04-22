@@ -1,13 +1,18 @@
-const csvToJSON = require('csvtojson');
-const fs = require('fs');
-const path = require('path');
+import csvToJSON from 'csvtojson'
+import fs from 'fs'
+import path from 'path'
+
 const strTypeOf = require('./string_type')
 
+
+type columnsType = {
+  [index: string]: string | undefined
+}
 type columsUntyped = {
   [index: string]: string[]
 }
 
-module.exports = (filename: string, schema: string | undefined) => {
+export const csv2sql = (filename: string, schema: string | undefined, inferTypes: boolean) => {
   const tablename = path.basename(filename,'.csv').replace(/[\s-]+/g, "_");
   const outputDirectory = path.dirname(filename);
   const outputFile = `${outputDirectory}/${tablename}.sql`;
@@ -32,7 +37,7 @@ module.exports = (filename: string, schema: string | undefined) => {
         return prev;
       }, {});
 
-      fs.writeFileSync(outputFile,  tableCreation(tablename, header, columns));
+      fs.writeFileSync(outputFile, tableCreation(tablename, header, columns, inferTypes));
 
       // Generate the list of columns in the insert statement
       fs.appendFileSync(outputFile, `insert into '${tablename}' \n`);
@@ -76,9 +81,7 @@ const generateTuple = (row: Map<string, any>) => {
 }
 
 
-type columnsType = {
-  [index: string]: string | undefined
-}
+
 /**
  * Infers SQL types based on values typing consistency across each column.
  * @param columns Values of each column, referenced by their column's name.
@@ -124,8 +127,8 @@ const tableCreation = (tablename: string, header: string[], columns: columsUntyp
   
   const columnTypes = inferTypeFromData(columns);
 
-  const createTable = header.reduce((prev: string, curr: string) => {
-    return `${prev}${curr} ${columnTypes[curr]},\n\t`;
+  const createTable = header.reduce((prev: string, collName: string) => {
+    return `${prev}${collName} ${columnTypes[collName]},\n\t`;
   }, '').slice(0, -3);
 
   return `drop table if exists '${tablename}';\ncreate table if not exists '${tablename}' (\n\t${createTable}\n);\n`;
