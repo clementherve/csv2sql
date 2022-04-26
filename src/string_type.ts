@@ -8,7 +8,6 @@ module.exports  = (value: string): string => {
     }
 
     return Object.keys(types).find((type: string) => {
-        // console.log(`value: ${value} -> ${type}`);
         return types[type](value);
     }) ?? 'string';
 }
