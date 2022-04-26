@@ -1,6 +1,4 @@
-const csv2sql = require('../out/csv2sql');
-const fs = require('fs');
-const { equal } = require('assert');
+import { csv2sql } from '../out/csv2sql'
 
 test('simple int table', async () => {
     const csv = `A; B

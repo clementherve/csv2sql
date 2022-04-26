@@ -1,5 +1,5 @@
 
-module.exports  = (value: string): string => {
+const stringTypeOf = (value: string): string => {
     const types: {[index: string] : ((val: string) => Boolean)} = {
         'double': (value: string) => Number.parseFloat(value).toString() != 'NaN' && value.includes('.'),
         'int': (value: string) => Number.parseInt(value).toString() != 'NaN' && !value.includes('.'),
@@ -11,3 +11,5 @@ module.exports  = (value: string): string => {
         return types[type](value);
     }) ?? 'string';
 }
+
+export default stringTypeOf;

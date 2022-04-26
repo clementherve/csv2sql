@@ -1,4 +1,4 @@
-const stringTypeOf = require('../out/string_type');
+import stringTypeOf from '../out/string_type.js'
 
 test('parsing integers', () => {
     expect(stringTypeOf('0')).toBe('int');
