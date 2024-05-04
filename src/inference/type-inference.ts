@@ -11,15 +11,15 @@ const inferSqlTypeFrom = (value: string): type => {
   return (Object.keys(typesFn) as type[]).find((type: type) => typesFn[type](value)) ?? 'string';
 };
 
-export type typedColumns = Record<string, string | undefined>;
-export type untypedColumns = Record<string, string[]>;
+export type TypedColumns = Record<string, string | undefined>;
+export type UntypedColumns = Record<string, string[]>;
 
 /**
  * Infers SQL types based on values typing consistency across each column.
  * @param columns Values of each column, referenced by their column's name.
  * @returns A columnsType object, with keys being the name from the header, and the value being a valid SQL type.
  */
-export const inferTypeFromData = (columns: untypedColumns): typedColumns => {
+export const inferTypeFromData = (columns: UntypedColumns): TypedColumns => {
   // todo: fixme. this is mssql binding
   const typeGuess: { [index: string]: any } = {
     tinyint: (value: any): boolean => inferSqlTypeFrom(value) === 'bool',
@@ -27,7 +27,7 @@ export const inferTypeFromData = (columns: untypedColumns): typedColumns => {
     double: (value: any): boolean => inferSqlTypeFrom(value) === 'double',
     text: (value: any): boolean => inferSqlTypeFrom(value) === 'string',
   };
-  const types: typedColumns = {};
+  const types: TypedColumns = {};
 
   Object.keys(columns).forEach((colName: string, i: number): void => {
     if (types[colName] != undefined) return;

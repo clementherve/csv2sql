@@ -1,14 +1,14 @@
-import { untypedColumns } from './type-inference';
+import { UntypedColumns } from './type-inference';
 
-export type uniqueColumns = Record<string, boolean>;
+export type UniqueColumns = Record<string, boolean>;
 
 /**
  * Infers uniqueness of values for each column.
  * @param columns Values of each column, referenced by their column's name.
  * @returns A columnUnique object, with column names being keys referencing a boolean. true -> unique.
  */
-export const inferUniqueness = (columns: untypedColumns): uniqueColumns => {
-  const unique: uniqueColumns = {};
+export const inferUniqueness = (columns: UntypedColumns): UniqueColumns => {
+  const unique: UniqueColumns = {};
   Object.keys(columns).map((columnName: string) => {
     const columnData = columns[columnName].slice(1);
 

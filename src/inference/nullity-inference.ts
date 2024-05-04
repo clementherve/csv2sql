@@ -1,4 +1,4 @@
-import { untypedColumns } from './type-inference';
+import { UntypedColumns } from './type-inference';
 
 export type nullableColumns = Record<string, boolean>;
 /**
@@ -6,7 +6,7 @@ export type nullableColumns = Record<string, boolean>;
  * @param columns Values of each column, referenced by their column's name.
  * @returns A columnsNullable object, with column names being keys referencing a boolean. true -> nullable.
  */
-export const inferNullity = (columns: untypedColumns): nullableColumns => {
+export const inferNullity = (columns: UntypedColumns): nullableColumns => {
   const isNullable: nullableColumns = {};
 
   Object.keys(columns).map((columnName: string) => {

@@ -1,10 +1,9 @@
-import csvToJSON from 'csvtojson'
-import stringTypeOf from './string_type.js'
-
+import csvToJSON from 'csvtojson';
+import stringTypeOf from './string_type';
 
 type columnsType = {
-  [index: string]: string | undefined
-}
+  [index: string]: string | undefined;
+};
 type columsUntyped = {
   [index: string]: string[];
 };
@@ -15,20 +14,13 @@ type columnsNullable = {
   [index: string]: boolean;
 };
 
-
-const csv2sql = async (
-  csv: string,
-  tablename: string,
-  inferTypes: boolean,
-
-  sqlSchema?: string) => {
-
+const csv2sql = async (csv: string, tablename: string, inferTypes?: boolean, sqlSchema?: string) => {
   const shouldInferSchema = sqlSchema == undefined;
 
   const json = await csvToJSON({
     trim: true,
     noheader: !shouldInferSchema,
-    delimiter: "auto",
+    delimiter: 'auto',
     quote: undefined,
   }).fromString(csv);
 
@@ -56,7 +48,7 @@ const csv2sql = async (
     // last row is different
     const insert =
       index == json.length - 1
-        ? generateTuple(row, columnTypes).slice(0, -3) + ";\n"
+        ? generateTuple(row, columnTypes).slice(0, -3) + ';\n'
         : generateTuple(row, columnTypes);
     query += insert;
   });
@@ -70,8 +62,8 @@ const csv2sql = async (
  * @returns The same string, but with ' escaped with '\'.
  */
 const sanitize = (value: string): string | null => {
-  const sanitized = value.replace(new RegExp("'", "g"), "\\'");
-  return sanitized != "" ? sanitized : null;
+  const sanitized = value.replace(new RegExp("'", 'g'), "\\'");
+  return sanitized != '' ? sanitized : null;
 };
 
 /**
@@ -80,9 +72,7 @@ const sanitize = (value: string): string | null => {
  * @returns A tuple containing the header row, sanitized and formatted.
  */
 const generateHeader = (header: string[]) => {
-  return `\t(${header
-    .reduce((p, c) => `${p}\`${sanitize(c)}\`, `, "")
-    .slice(0, -2)})\n `;
+  return `\t(${header.reduce((p, c) => `${p}\`${sanitize(c)}\`, `, '').slice(0, -2)})\n `;
 };
 
 /**
@@ -96,17 +86,16 @@ const generateTuple = (row: Map<string, any>, columnsTypes: columnsType) => {
 
   return `\t(${Object.values(row)
     .reduce((p: string, c: string, i: number) => {
-      if (types[i] === "int" || types[i] === "double") {
+      if (types[i] === 'int' || types[i] === 'double') {
         return `${p}${sanitize(c)}, `;
-      } else if (types[i] === "tinyint") {
-        return `${p}${c.toLowerCase() === "true" ? 1 : 0}, `;
+      } else if (types[i] === 'tinyint') {
+        return `${p}${c.toLowerCase() === 'true' ? 1 : 0}, `;
       } else {
         return `${p}'${sanitize(c)}', `;
       }
-    }, "")
+    }, '')
     .slice(0, -2)}), \n`;
 };
-
 
 /**
  * Infers SQL types based on values typing consistency across each column.
@@ -115,10 +104,10 @@ const generateTuple = (row: Map<string, any>, columnsTypes: columnsType) => {
  */
 const inferTypeFromData = (columns: columsUntyped): columnsType => {
   const typeGuess: { [index: string]: any } = {
-    tinyint: (value: any): boolean => stringTypeOf(value) == "bool",
-    int: (value: any): boolean => stringTypeOf(value) == "int",
-    double: (value: any): boolean => stringTypeOf(value) == "double",
-    text: (value: any): boolean => stringTypeOf(value) == "string",
+    tinyint: (value: any): boolean => stringTypeOf(value) == 'bool',
+    int: (value: any): boolean => stringTypeOf(value) == 'int',
+    double: (value: any): boolean => stringTypeOf(value) == 'double',
+    text: (value: any): boolean => stringTypeOf(value) == 'string',
   };
   const types: columnsType = {};
 
@@ -131,7 +120,7 @@ const inferTypeFromData = (columns: columsUntyped): columnsType => {
       const type: string = Object.keys(typeGuess)[index];
 
       const isTypeConsistent: boolean = columns[colName]
-        .filter((value) => value != "")
+        .filter((value) => value != '')
         .every((value: any): boolean => {
           return typeGuess[type](value);
         });
@@ -177,7 +166,7 @@ const inferNullity = (columns: columsUntyped): columnsNullable => {
       }
     });
   });
-  
+
   return isNullable;
 };
 
@@ -193,14 +182,14 @@ const tableCreation = (
   header: string[],
   columnTypes: columnsType,
   unique: columnsUnique,
-  nullable: columnsNullable
+  nullable: columnsNullable,
 ) => {
   const createTable = header
     .reduce((prev: string, collName: string) => {
-      return `${prev}\`${collName}\` ${columnTypes[collName]}${
-        unique[collName] ? ' unique' : ''
-      }${nullable[collName] ? '' : ' not null'}, \n\t`;
-    }, "")
+      return `${prev}\`${collName}\` ${columnTypes[collName]}${unique[collName] ? ' unique' : ''}${
+        nullable[collName] ? '' : ' not null'
+      }, \n\t`;
+    }, '')
     .slice(0, -4);
 
   return `drop table if exists \`${tablename}\`; \ncreate table if not exists \`${tablename}\` (\n\t${createTable}\n); \n`;

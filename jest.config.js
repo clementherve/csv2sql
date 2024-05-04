@@ -1,7 +1,9 @@
 export default {
-    testEnvironment: 'jest-environment-node',
-    transform: {},
-    collectCoverage: true,
+  testEnvironment: 'jest-environment-node',
+  transform: {
+    '^.+\\.ts$': 'ts-jest',
+  },
+  collectCoverage: true,
 };
 /*
 export default {

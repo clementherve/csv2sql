@@ -1,5 +1,5 @@
 import { escapeQuote } from '../helpers/escape-quote';
-import { typedColumns } from '../inference/type-inference';
+import { TypedColumns } from '../inference/type-inference';
 
 /**
  * Generate the header row for the SQL insertion.
@@ -16,7 +16,7 @@ const generateColumnNamesTuple = (columnsNames: string[]) => {
  * @param columnsTypes The types of the columns.
  * @returns an SQL insertion row.
  */
-const generateColumnValuesTuple = (row: Map<string, any>, columnsTypes: typedColumns) => {
+const generateColumnValuesTuple = (row: Map<string, any>, columnsTypes: TypedColumns) => {
   const types = Object.values(columnsTypes);
 
   // todo: fixme -> specific to mssql
@@ -36,7 +36,7 @@ const generateColumnValuesTuple = (row: Map<string, any>, columnsTypes: typedCol
 export const generateInsert = (
   tableName: string,
   columnsNames: string[],
-  columnsTypes: typedColumns,
+  columnsTypes: TypedColumns,
   data: any,
 ) => {
   let insertQuery = `insert into \`${tableName}\` \n${generateColumnNamesTuple(columnsNames)}values \n`;
@@ -56,7 +56,7 @@ export const generateInsert = (
 export const generateMultipleInsert = (
   tableName: string,
   columnsNames: string[],
-  columnsTypes: typedColumns,
+  columnsTypes: TypedColumns,
   data: any,
 ) => {
   let insertQueries = '';

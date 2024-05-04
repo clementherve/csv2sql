@@ -1,6 +1,6 @@
 import { nullableColumns } from '../inference/nullity-inference';
-import { typedColumns } from '../inference/type-inference';
-import { uniqueColumns } from '../inference/uniqueness-inference';
+import { TypedColumns } from '../inference/type-inference';
+import { UniqueColumns } from '../inference/uniqueness-inference';
 
 /**
  * Create a SQL table schema.
@@ -12,8 +12,8 @@ import { uniqueColumns } from '../inference/uniqueness-inference';
 export const tableCreation = (
   tablename: string,
   header: string[],
-  columnTypes: typedColumns,
-  unique: uniqueColumns,
+  columnTypes: TypedColumns,
+  unique: UniqueColumns,
   nullable: nullableColumns,
 ) => {
   const createTable = header
