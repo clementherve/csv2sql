@@ -1,5 +1,4 @@
 import csvToJSON from 'csvtojson';
-import stringTypeOf from './helpers/string-type';
 import { createTableQuery } from './create/table';
 import { inferTypeFromData } from './inference/type-inference';
 import { inferUniqueness } from './inference/uniqueness-inference';
@@ -26,7 +25,7 @@ const csv2sql = async (csv: string, options: Options) => {
     trim: true,
     noheader: false,
     delimiter: 'auto',
-    quote: undefined,
+    quote: '',
   }).fromString(csv);
 
   const columnNames = Object.keys(json[0]);

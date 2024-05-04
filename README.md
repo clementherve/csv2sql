@@ -1,4 +1,5 @@
 # CSV2SQL
+
 Create a MySQL table from any CSV using javascript.
 
 ## Setup
@@ -10,8 +11,9 @@ Create a MySQL table from any CSV using javascript.
 ```
 
 ### Testing
+
 ```
-    npm run test
+    npm run tests
 ```
 
 ## Usage
@@ -23,7 +25,9 @@ Run the following command and the SQL file should be generated.
 ```
 
 ### Example
+
 The following file: `./example/example.csv`
+
 ```csv
 A; B; C; D
 0; 1; 2; hoy
@@ -32,18 +36,19 @@ A; B; C; D
 ```
 
 Will be transformed to:
+
 ```sql
-drop table if exists `example`; 
+drop table if exists `example`;
 create table if not exists `example` (
-	`A` int unique, 
-	`B` int not null, 
-	`C` int unique not null, 
+	`A` int unique,
+	`B` int not null,
+	`C` int unique not null,
 	`D` text not null
-); 
-insert into `example` 
+);
+insert into `example`
 	(`A`, `B`, `C`, `D`)
- values 
-	(0, 1, 2, 'hoy'), 
-	(null, 1, 3, 'hoy'), 
+ values
+	(0, 1, 2, 'hoy'),
+	(null, 1, 3, 'hoy'),
 	(2, 2, 5, 'h\'ay');
 ```

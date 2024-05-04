@@ -6,6 +6,8 @@ import { ArgumentParser } from 'argparse';
 
 const parser = new ArgumentParser();
 
+parser.add_argument('');
+
 parser.add_argument('-u', '--infer-unique', {
   nargs: '*',
   help: 'Infer uniqueness in --create-table mode.',

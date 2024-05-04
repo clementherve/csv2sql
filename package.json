@@ -1,6 +1,5 @@
 {
   "name": "csv2sql",
-  "type": "module",
   "version": "1.0.0",
   "description": "Create a SQL table from CSV using Node.js script",
   "main": "out/main.js",

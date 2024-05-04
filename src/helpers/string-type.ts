@@ -8,7 +8,7 @@ const stringTypeOf = (value: string): string => {
 
   return (
     Object.keys(types).find((type: string) => {
-      return types[type](value);
+      return types[type]!(value);
     }) ?? 'string'
   );
 };
