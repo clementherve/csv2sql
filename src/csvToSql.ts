@@ -1,17 +1,26 @@
 import csvToJSON from 'csvtojson';
-import stringTypeOf from './string_type';
+import stringTypeOf from './string_type.js';
 
-type columnsType = {
+type ColumnName = string;
+type Data = any;
+
+type ColumnsType = {
   [index: string]: string | undefined;
 };
-type columsUntyped = {
+type ColumsUntyped = {
   [index: string]: string[];
 };
-type columnsUnique = {
+type ColumnsUnique = {
   [index: string]: boolean;
 };
-type columnsNullable = {
+type ColumnsNullable = {
   [index: string]: boolean;
+};
+
+type Options = {
+  inferType: boolean;
+  inferUniqueness: boolean;
+  sqlSchema: string;
 };
 
 const csv2sql = async (csv: string, tablename: string, inferTypes?: boolean, sqlSchema?: string) => {
@@ -27,7 +36,7 @@ const csv2sql = async (csv: string, tablename: string, inferTypes?: boolean, sql
   const header = Object.keys(json[0]);
 
   // order values by column name
-  const columns: columsUntyped = json.reduce((prev: any, curr: any) => {
+  const columns: ColumsUntyped = json.reduce((prev: any, curr: any) => {
     Object.keys(curr).forEach((key: string) => {
       prev[key] = [...(prev[key] ?? [curr[key]]), curr[key]];
     });
@@ -81,7 +90,7 @@ const generateHeader = (header: string[]) => {
  * @param columnsTypes The types of the columns.
  * @returns an SQL insertion row.
  */
-const generateTuple = (row: Map<string, any>, columnsTypes: columnsType) => {
+const generateTuple = (row: Map<string, any>, columnsTypes: ColumnsType) => {
   const types = Object.values(columnsTypes);
 
   return `\t(${Object.values(row)
@@ -102,14 +111,14 @@ const generateTuple = (row: Map<string, any>, columnsTypes: columnsType) => {
  * @param columns Values of each column, referenced by their column's name.
  * @returns A columnsType object, with keys being the name from the header, and the value being a valid SQL type.
  */
-const inferTypeFromData = (columns: columsUntyped): columnsType => {
+const inferTypeFromData = (columns: ColumsUntyped): ColumnsType => {
   const typeGuess: { [index: string]: any } = {
     tinyint: (value: any): boolean => stringTypeOf(value) == 'bool',
     int: (value: any): boolean => stringTypeOf(value) == 'int',
     double: (value: any): boolean => stringTypeOf(value) == 'double',
     text: (value: any): boolean => stringTypeOf(value) == 'string',
   };
-  const types: columnsType = {};
+  const types: ColumnsType = {};
 
   Object.keys(columns).forEach((colName: string, i: number): void => {
     if (types[colName] != undefined) return;
@@ -137,8 +146,9 @@ const inferTypeFromData = (columns: columsUntyped): columnsType => {
  * @param columns Values of each column, referenced by their column's name.
  * @returns A columnUnique object, with column names being keys referencing a boolean. true -> unique.
  */
-const inferUniqueness = (columns: columsUntyped): columnsUnique => {
-  const unique: columnsUnique = {};
+const inferUniqueness = (columns: ColumsUntyped): ColumnsUnique => {
+  const unique: ColumnsUnique = {};
+
   Object.keys(columns).map((collName: string) => {
     const col = columns[collName].slice(1);
     col.forEach((value: any, i: number) => {
@@ -147,6 +157,7 @@ const inferUniqueness = (columns: columsUntyped): columnsUnique => {
       }
     });
   });
+
   return unique;
 };
 
@@ -155,8 +166,8 @@ const inferUniqueness = (columns: columsUntyped): columnsUnique => {
  * @param columns Values of each column, referenced by their column's name.
  * @returns A columnsNullable object, with column names being keys referencing a boolean. true -> nullable.
  */
-const inferNullity = (columns: columsUntyped): columnsNullable => {
-  const isNullable: columnsNullable = {};
+const inferNullity = (columns: ColumsUntyped): ColumnsNullable => {
+  const isNullable: ColumnsNullable = {};
 
   Object.keys(columns).map((collName: string) => {
     const col = columns[collName].slice(1);
@@ -180,9 +191,9 @@ const inferNullity = (columns: columsUntyped): columnsNullable => {
 const tableCreation = (
   tablename: string,
   header: string[],
-  columnTypes: columnsType,
-  unique: columnsUnique,
-  nullable: columnsNullable,
+  columnTypes: ColumnsType,
+  unique: ColumnsUnique,
+  nullable: ColumnsNullable,
 ) => {
   const createTable = header
     .reduce((prev: string, collName: string) => {

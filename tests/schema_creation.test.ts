@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { csv2sql } from '../src/csv2sql';
+import { csv2sql } from '../src/csvToSql';
 
 test('simple int table', async () => {
   const csv = readFileSync('./tests/data/fileA.csv', 'utf-8');
