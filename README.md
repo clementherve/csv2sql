@@ -1,3 +1,5 @@
+![CodeQL](https://github.com/clementherve/csv2sql/actions/workflows/codeql.yml/badge.svg)
+
 # CSV2SQL
 
 Create a MySQL table from any CSV using javascript.
@@ -5,8 +7,8 @@ Create a MySQL table from any CSV using javascript.
 ## Setup
 
 ```bash
-    git clone https://github.com/clementherve/csv-to-sql-js.git
-    npm i
+    git clone https://github.com/clementherve/csv2sql.git
+    pnpm i
     npm run build
 ```
 
@@ -21,12 +23,14 @@ Create a MySQL table from any CSV using javascript.
 Run the following command and the SQL file should be generated.
 
 ```bash
-    node ./out/main.js <csv file> [sql table creation file]
+    node ./out/src/cli.js <csv file>
+	// or
+	bun ./src/cli.ts
 ```
 
 ### Example
 
-The following file: `./example/example.csv`
+The file `./example/example.csv`
 
 ```csv
 A; B; C; D
@@ -35,7 +39,7 @@ A; B; C; D
 2; 2; 5; h'ay
 ```
 
-Will be transformed to:
+will be transformed to
 
 ```sql
 drop table if exists `example`;
