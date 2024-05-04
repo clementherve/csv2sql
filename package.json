@@ -15,23 +15,19 @@
   },
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/mortie23/csv-to-sql-js/issues"
-  },
-  "homepage": "https://github.com/mortie23/csv-to-sql-js#readme",
   "dependencies": {
-    "@types/argparse": "^2.0.10",
-    "@types/chalk": "^2.2.0",
-    "@types/csvtojson": "^2.0.0",
-    "@types/node": "^17.0.23",
     "argparse": "^2.0.1",
-    "chalk": "^4.1.0",
+    "chalk": "^4.1.2",
     "csvtojson": "^2.0.10",
-    "fs": "0.0.1-security"
+    "knex": "^3.1.0"
   },
   "devDependencies": {
-    "@types/jest": "^27.4.1",
-    "jest": "^27.5.1",
-    "ts-jest": "^27.1.4"
+    "@types/argparse": "^2.0.16",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^17.0.45",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
   }
 }
