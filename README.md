@@ -24,8 +24,8 @@ Run the following command and the SQL file should be generated.
 
 ```bash
     node ./out/src/cli.js <csv file>
-	// or
-	bun ./src/cli.ts
+    # or
+    bun ./src/cli.ts
 ```
 
 ### Example
