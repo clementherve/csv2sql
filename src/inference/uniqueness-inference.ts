@@ -10,7 +10,7 @@ export type UniqueColumns = Record<string, boolean>;
 export const inferUniqueness = (columns: UntypedColumns): UniqueColumns => {
   const unique: UniqueColumns = {};
   Object.keys(columns).map((columnName: string) => {
-    const columnData = columns[columnName].slice(1);
+    const columnData = columns[columnName]!.slice(1);
 
     columnData.forEach((value: any) => {
       if (unique[columnName] !== false || !(columnName in unique)) {

@@ -29,19 +29,19 @@ export const inferTypeFromData = (columns: UntypedColumns): TypedColumns => {
   };
   const types: TypedColumns = {};
 
-  Object.keys(columns).forEach((colName: string, i: number): void => {
+  Object.keys(columns).forEach((colName: string): void => {
     if (types[colName] != undefined) return;
 
     types[colName] = undefined;
 
-    Object.keys(typeGuess).forEach((value: string, index: number): void => {
-      const type: string = Object.keys(typeGuess)[index];
+    Object.keys(typeGuess).forEach((_: string, index: number): void => {
+      const type: string = Object.keys(typeGuess)[index]!;
 
-      const isTypeConsistent: boolean = columns[colName]
-        .filter((value) => value != '')
-        .every((value: any): boolean => {
+      const isTypeConsistent: boolean = columns[colName]!.filter((value) => value != '').every(
+        (value: any): boolean => {
           return typeGuess[type](value);
-        });
+        },
+      );
 
       types[colName] = isTypeConsistent ? type : types[colName];
     });

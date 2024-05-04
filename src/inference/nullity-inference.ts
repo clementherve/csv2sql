@@ -10,7 +10,7 @@ export const inferNullity = (columns: UntypedColumns): nullableColumns => {
   const isNullable: nullableColumns = {};
 
   Object.keys(columns).map((columnName: string) => {
-    const columnData = columns[columnName].slice(1);
+    const columnData = columns[columnName]!.slice(1);
 
     columnData.forEach((value: any) => {
       if (isNullable[columnName] === false || !(columnName in isNullable)) {
