@@ -1,4 +1,4 @@
-import stringTypeOf from '../src/string_type';
+import stringTypeOf from '../src/helpers/string-type';
 
 test('parsing integers', () => {
   expect(stringTypeOf('0')).toBe('int');

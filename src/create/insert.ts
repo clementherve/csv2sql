@@ -2,19 +2,14 @@ import { escapeQuote } from '../helpers/escape-quote';
 import { TypedColumns } from '../inference/type-inference';
 
 /**
- * Generate the header row for the SQL insertion.
- * @param header the header values.
- * @returns A tuple containing the header row, sanitized and formatted.
+ * Generate the header row (A, B, C).
  */
 const generateColumnNamesTuple = (columnsNames: string[]) => {
   return `\t(${columnsNames.reduce((p, c) => `${p}\`${escapeQuote(c)}\`, `, '').slice(0, -2)})\n `;
 };
 
 /**
- * Generates an insert tuple: (x, y, ...).
- * @param row A row mapping a string with anything.
- * @param columnsTypes The types of the columns.
- * @returns an SQL insertion row.
+ * Generates the value tuple: (x, y, ...).
  */
 const generateColumnValuesTuple = (row: Map<string, any>, columnsTypes: TypedColumns) => {
   const types = Object.values(columnsTypes);
@@ -33,36 +28,38 @@ const generateColumnValuesTuple = (row: Map<string, any>, columnsTypes: TypedCol
     .slice(0, -2)}), \n`;
 };
 
-export const generateInsert = (
-  tableName: string,
-  columnsNames: string[],
-  columnsTypes: TypedColumns,
-  data: any,
-) => {
-  let insertQuery = `insert into \`${tableName}\` \n${generateColumnNamesTuple(columnsNames)}values \n`;
+type Options = {
+  tableName: string;
+  columnNames: string[];
+  columnTypes: TypedColumns;
+  rows: any[];
+};
 
-  data.forEach((row: Map<string, any>, index: number) => {
-    const isLastRow = index == data.length - 1;
+export const createSingleInsertQuery = (options: Options) => {
+  let insertQuery = `insert into \`${options.tableName}\` \n${generateColumnNamesTuple(
+    options.columnNames,
+  )}values \n`;
+
+  options.rows.forEach((row: Map<string, any>, index: number) => {
+    const isLastRow = index === options.rows.length - 1;
+
     if (isLastRow) {
-      insertQuery += generateColumnValuesTuple(row, columnsTypes).slice(0, -3) + ';\n';
+      insertQuery += generateColumnValuesTuple(row, options.columnTypes).slice(0, -3) + ';\n';
     } else {
-      insertQuery += generateColumnValuesTuple(row, columnsTypes);
+      insertQuery += generateColumnValuesTuple(row, options.columnTypes);
     }
   });
 
   return insertQuery;
 };
 
-export const generateMultipleInsert = (
-  tableName: string,
-  columnsNames: string[],
-  columnsTypes: TypedColumns,
-  data: any,
-) => {
+export const createMultipleInsertQuery = (options: Options) => {
   let insertQueries = '';
-  data.forEach((row: Map<string, any>) => {
-    insertQueries += `insert into \`${tableName}\` \n${generateColumnNamesTuple(columnsNames)}values \n`;
-    insertQueries += generateColumnValuesTuple(row, columnsTypes).slice(0, -3) + ';\n';
+  options.rows.forEach((row: Map<string, any>) => {
+    insertQueries += `insert into \`${options.tableName}\` \n${generateColumnNamesTuple(
+      options.columnNames,
+    )}values \n`;
+    insertQueries += generateColumnValuesTuple(row, options.columnTypes).slice(0, -3) + ';\n';
   });
 
   return insertQueries;

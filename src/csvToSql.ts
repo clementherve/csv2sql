@@ -1,39 +1,35 @@
 import csvToJSON from 'csvtojson';
-import stringTypeOf from './string_type.js';
+import stringTypeOf from './helpers/string-type';
+import { createTableQuery } from './create/table';
+import { inferTypeFromData } from './inference/type-inference';
+import { inferUniqueness } from './inference/uniqueness-inference';
+import { inferNullity } from './inference/nullity-inference';
+import { createMultipleInsertQuery, createSingleInsertQuery } from './create/insert';
 
-type ColumnName = string;
-type Data = any;
-
-type ColumnsType = {
-  [index: string]: string | undefined;
-};
 type ColumsUntyped = {
   [index: string]: string[];
 };
-type ColumnsUnique = {
-  [index: string]: boolean;
-};
-type ColumnsNullable = {
-  [index: string]: boolean;
-};
 
 type Options = {
-  inferType: boolean;
-  inferUniqueness: boolean;
-  sqlSchema: string;
+  tableName: string;
+  createTable?: boolean;
+  inferUnique?: boolean;
+  multilineInsert?: boolean;
 };
 
-const csv2sql = async (csv: string, tablename: string, inferTypes?: boolean, sqlSchema?: string) => {
-  const shouldInferSchema = sqlSchema == undefined;
+const csv2sql = async (csv: string, options: Options) => {
+  const tableName = options.tableName;
+  const inferUnique = !!options.inferUnique;
+  const createTable = !!options.createTable;
 
   const json = await csvToJSON({
     trim: true,
-    noheader: !shouldInferSchema,
+    noheader: false,
     delimiter: 'auto',
     quote: undefined,
   }).fromString(csv);
 
-  const header = Object.keys(json[0]);
+  const columnNames = Object.keys(json[0]);
 
   // order values by column name
   const columns: ColumsUntyped = json.reduce((prev: any, curr: any) => {
@@ -44,166 +40,38 @@ const csv2sql = async (csv: string, tablename: string, inferTypes?: boolean, sql
   }, {});
 
   const columnTypes = inferTypeFromData(columns);
-  const columnUnique = inferUniqueness(columns);
+  const columnUnique = inferUnique ? inferUniqueness(columns) : {};
   const columnNullable = inferNullity(columns);
 
-  let query = tableCreation(tablename, header, columnTypes, columnUnique, columnNullable);
+  let query = '';
 
-  // Generate the list of columns in the insert statement
-  query += `insert into \`${tablename}\` \n${generateHeader(header)}values \n`;
+  if (createTable) {
+    query += createTableQuery({
+      tableName,
+      columnNames,
+      columnTypes,
+      columnUnique,
+      columnNullable,
+    });
+  }
 
-  // generate the insert tuples
-  json.forEach((row: Map<string, any>, index: number) => {
-    // last row is different
-    const insert =
-      index == json.length - 1
-        ? generateTuple(row, columnTypes).slice(0, -3) + ';\n'
-        : generateTuple(row, columnTypes);
-    query += insert;
-  });
+  if (options.multilineInsert) {
+    query += createMultipleInsertQuery({
+      tableName,
+      columnNames,
+      columnTypes,
+      rows: json,
+    });
+  } else {
+    query += createSingleInsertQuery({
+      tableName,
+      columnNames,
+      columnTypes,
+      rows: json,
+    });
+  }
 
   return query;
-};
-
-/**
- * Sanitize a string. Basically escapes the '.
- * @param value A string to sanitize.
- * @returns The same string, but with ' escaped with '\'.
- */
-const sanitize = (value: string): string | null => {
-  const sanitized = value.replace(new RegExp("'", 'g'), "\\'");
-  return sanitized != '' ? sanitized : null;
-};
-
-/**
- * Generate the header row for the SQL insertion.
- * @param header the header values.
- * @returns A tuple containing the header row, sanitized and formatted.
- */
-const generateHeader = (header: string[]) => {
-  return `\t(${header.reduce((p, c) => `${p}\`${sanitize(c)}\`, `, '').slice(0, -2)})\n `;
-};
-
-/**
- * Generates an insert tuple: (x, y, ...).
- * @param row A row mapping a string with anything.
- * @param columnsTypes The types of the columns.
- * @returns an SQL insertion row.
- */
-const generateTuple = (row: Map<string, any>, columnsTypes: ColumnsType) => {
-  const types = Object.values(columnsTypes);
-
-  return `\t(${Object.values(row)
-    .reduce((p: string, c: string, i: number) => {
-      if (types[i] === 'int' || types[i] === 'double') {
-        return `${p}${sanitize(c)}, `;
-      } else if (types[i] === 'tinyint') {
-        return `${p}${c.toLowerCase() === 'true' ? 1 : 0}, `;
-      } else {
-        return `${p}'${sanitize(c)}', `;
-      }
-    }, '')
-    .slice(0, -2)}), \n`;
-};
-
-/**
- * Infers SQL types based on values typing consistency across each column.
- * @param columns Values of each column, referenced by their column's name.
- * @returns A columnsType object, with keys being the name from the header, and the value being a valid SQL type.
- */
-const inferTypeFromData = (columns: ColumsUntyped): ColumnsType => {
-  const typeGuess: { [index: string]: any } = {
-    tinyint: (value: any): boolean => stringTypeOf(value) == 'bool',
-    int: (value: any): boolean => stringTypeOf(value) == 'int',
-    double: (value: any): boolean => stringTypeOf(value) == 'double',
-    text: (value: any): boolean => stringTypeOf(value) == 'string',
-  };
-  const types: ColumnsType = {};
-
-  Object.keys(columns).forEach((colName: string, i: number): void => {
-    if (types[colName] != undefined) return;
-
-    types[colName] = undefined;
-
-    Object.keys(typeGuess).forEach((value: string, index: number): void => {
-      const type: string = Object.keys(typeGuess)[index];
-
-      const isTypeConsistent: boolean = columns[colName]
-        .filter((value) => value != '')
-        .every((value: any): boolean => {
-          return typeGuess[type](value);
-        });
-
-      types[colName] = isTypeConsistent ? type : types[colName];
-    });
-  });
-
-  return types;
-};
-
-/**
- * Infers uniqueness for each column.
- * @param columns Values of each column, referenced by their column's name.
- * @returns A columnUnique object, with column names being keys referencing a boolean. true -> unique.
- */
-const inferUniqueness = (columns: ColumsUntyped): ColumnsUnique => {
-  const unique: ColumnsUnique = {};
-
-  Object.keys(columns).map((collName: string) => {
-    const col = columns[collName].slice(1);
-    col.forEach((value: any, i: number) => {
-      if (unique[collName] != false || !(collName in unique)) {
-        unique[collName] = col.lastIndexOf(value) == col.indexOf(value);
-      }
-    });
-  });
-
-  return unique;
-};
-
-/**
- * Infers the nullable aspect of a column.
- * @param columns Values of each column, referenced by their column's name.
- * @returns A columnsNullable object, with column names being keys referencing a boolean. true -> nullable.
- */
-const inferNullity = (columns: ColumsUntyped): ColumnsNullable => {
-  const isNullable: ColumnsNullable = {};
-
-  Object.keys(columns).map((collName: string) => {
-    const col = columns[collName].slice(1);
-    col.forEach((value: any, i: number) => {
-      if (isNullable[collName] == false || !(collName in isNullable)) {
-        isNullable[collName] = value == '';
-      }
-    });
-  });
-
-  return isNullable;
-};
-
-/**
- * Create a SQL table schema.
- * @param tablename Name of the table.
- * @param header Header row of the csv file. If not present, the function should not be called.
- * @param columnTypes The columns types
- * @returns A create statement for the table.
- */
-const tableCreation = (
-  tablename: string,
-  header: string[],
-  columnTypes: ColumnsType,
-  unique: ColumnsUnique,
-  nullable: ColumnsNullable,
-) => {
-  const createTable = header
-    .reduce((prev: string, collName: string) => {
-      return `${prev}\`${collName}\` ${columnTypes[collName]}${unique[collName] ? ' unique' : ''}${
-        nullable[collName] ? '' : ' not null'
-      }, \n\t`;
-    }, '')
-    .slice(0, -4);
-
-  return `drop table if exists \`${tablename}\`; \ncreate table if not exists \`${tablename}\` (\n\t${createTable}\n); \n`;
 };
 
 export { csv2sql };

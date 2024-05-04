@@ -1,28 +1,27 @@
-import { nullableColumns } from '../inference/nullity-inference';
 import { TypedColumns } from '../inference/type-inference';
 import { UniqueColumns } from '../inference/uniqueness-inference';
 
-/**
- * Create a SQL table schema.
- * @param tablename Name of the table.
- * @param header Header row of the csv file. If not present, the function should not be called.
- * @param columnTypes The columns types
- * @returns A create statement for the table.
- */
-export const tableCreation = (
-  tablename: string,
-  header: string[],
-  columnTypes: TypedColumns,
-  unique: UniqueColumns,
-  nullable: nullableColumns,
-) => {
-  const createTable = header
-    .reduce((prev: string, collName: string) => {
-      return `${prev}\`${collName}\` ${columnTypes[collName]}${unique[collName] ? ' unique' : ''}${
-        nullable[collName] ? '' : ' not null'
-      }, \n\t`;
-    }, '')
-    .slice(0, -4);
+type Options = {
+  tableName: string;
+  columnNames: string[];
+  columnTypes: TypedColumns;
+  columnUnique: UniqueColumns;
+  columnNullable: any;
+};
 
-  return `drop table if exists \`${tablename}\`; \ncreate table if not exists \`${tablename}\` (\n\t${createTable}\n); \n`;
+export const createTableQuery = (options: Options) => {
+  const dropTable = `drop table if exists \`${options.tableName}\``;
+  const createTable = `create table if not exists \`${options.tableName}\``;
+
+  return `${dropTable}; ${createTable} (${options.columnNames
+    .reduce((acc: string, columnName: string) => `${acc}\`${createTableColumn(columnName, options)}`, '')
+    .slice(0, -2)}); `;
+};
+
+const createTableColumn = (columnName: string, options: Options) => {
+  const type = options.columnTypes[columnName];
+  const unique = options.columnUnique[columnName] ? ' unique' : '';
+  const nullable = options.columnNullable[columnName] ? '' : ' not null';
+
+  return `${columnName}\` ${type}${unique}${nullable}, `;
 };
