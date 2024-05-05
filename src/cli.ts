@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import fs from 'fs';
-import { csv2sql } from './csvToSql';
+import { csv2sql } from './csv2sql';
 import path from 'path';
 import { ArgumentParser } from 'argparse';
 
@@ -41,14 +41,6 @@ if (!fs.existsSync(csvFileName)) {
   process.exit(-1);
 }
 
-if (inferUnique) {
-  console.log(
-    chalk.yellow(
-      'Both schema inference and schema were provided. Provided schema will supercede the inferences',
-    ),
-  );
-}
-
 (async () => {
   console.log(chalk.grey(`- Reading ${csvFileName}...`));
 
@@ -70,22 +62,3 @@ if (inferUnique) {
     console.log(generatedSql);
   }
 })();
-
-/*
-
-
-
-
-
-
-
-(async () => {
-  console.log(chalk.grey(`- Reading ${csvFile}...`));
-  const csv = fs.readFileSync(csvFile, 'utf-8');
-  const SQL = await csv2sql(csv, tablename, false, DBSchema);
-  
-  console.log(chalk.grey(`- Finished SQL generation`));
-  console.log(chalk.bgHex('#A3BE8C').white(`File: ${outputFile}`));
-  fs.writeFileSync(outputFile, SQL);
-})()
-*/

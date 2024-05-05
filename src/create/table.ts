@@ -1,3 +1,4 @@
+import { NullableColumns } from '../inference/nullity-inference';
 import { TypedColumns } from '../inference/type-inference';
 import { UniqueColumns } from '../inference/uniqueness-inference';
 
@@ -6,7 +7,7 @@ type Options = {
   columnNames: string[];
   columnTypes: TypedColumns;
   columnUnique: UniqueColumns;
-  columnNullable: any;
+  columnNullable: NullableColumns;
 };
 
 export const createTableQuery = (options: Options) => {

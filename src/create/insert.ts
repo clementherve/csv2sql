@@ -28,11 +28,15 @@ const generateColumnValuesTuple = (row: Map<string, any>, columnsTypes: TypedCol
     .slice(0, -2)}), \n`;
 };
 
+type ColumnName = string;
+type Value = any;
+type Row = Map<string, Value>;
+
 type Options = {
   tableName: string;
-  columnNames: string[];
+  columnNames: ColumnName[];
   columnTypes: TypedColumns;
-  rows: any[];
+  rows: Row[];
 };
 
 export const createSingleInsertQuery = (options: Options) => {
@@ -40,7 +44,7 @@ export const createSingleInsertQuery = (options: Options) => {
     options.columnNames,
   )}values \n`;
 
-  options.rows.forEach((row: Map<string, any>, index: number) => {
+  options.rows.forEach((row: Row, index: number) => {
     const isLastRow = index === options.rows.length - 1;
 
     if (isLastRow) {
