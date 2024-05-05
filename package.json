@@ -1,6 +1,6 @@
 {
   "name": "csv2sql",
-  "version": "1.0.0",
+  "version": "0.0.1-test",
   "description": "Create a SQL table from CSV using Node.js",
   "main": "out/src/cli.js",
   "scripts": {
@@ -13,8 +13,8 @@
     "type": "git",
     "url": "git+https://github.com/clementherve/csv2sql.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Clement Herve",
+  "license": "MIT License",
   "dependencies": {
     "argparse": "^2.0.1",
     "chalk": "^5.3.0",
