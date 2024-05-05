@@ -6,7 +6,8 @@
   "scripts": {
     "build:watch": "npx tsc --watch -b tsconfig.json",
     "build:prod": "npx tsc -b tsconfig.prod.json",
-    "tests": "jest --onlyChanged --coverage --watch",
+    "tests": "jest",
+    "tests:watch": "jest --onlyChanged --coverage --watch",
     "tests:leaks": "jest --onlyChanged --detectLeaks --coverage --watch"
   },
   "repository": {
