@@ -4,9 +4,10 @@
   "description": "Create a SQL table from CSV using Node.js",
   "main": "out/src/cli.js",
   "scripts": {
-    "dev": "npx tsc --watch",
-    "build": "npx tsc",
-    "tests": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "build:watch": "npx tsc --watch -b tsconfig.json",
+    "build:prod": "npx tsc -b tsconfig.prod.json",
+    "tests": "jest --onlyChanged --coverage --watch",
+    "tests:leaks": "jest --onlyChanged --detectLeaks --coverage --watch"
   },
   "repository": {
     "type": "git",
