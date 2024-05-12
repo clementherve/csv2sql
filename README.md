@@ -1,4 +1,5 @@
 ![CodeQL](https://github.com/clementherve/csv2sql/actions/workflows/codeql.yml/badge.svg)
+![Jest](https://github.com/clementherve/csv2sql/actions/workflows/run-tests.yml/badge.svg)
 
 # CSV-TO-SQL
 
