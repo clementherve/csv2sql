@@ -1,13 +1,10 @@
 import csvToJSON from 'csvtojson';
 import { createTableQuery } from './create/table';
-import { inferTypeFromData } from './inference/type-inference';
+import { inferTypeFromData, UntypedColumns } from './inference/type-inference';
 import { inferUniqueness } from './inference/uniqueness-inference';
 import { inferNullity } from './inference/nullity-inference';
 import { createMultipleInsertQuery, createSingleInsertQuery } from './create/insert';
-
-type ColumsUntyped = {
-  [index: string]: string[];
-};
+import SqliteMapper from './mapper/sqlite-mapper';
 
 type Options = {
   tableName: string;
@@ -16,7 +13,7 @@ type Options = {
   multilineInsert?: boolean;
 };
 
-const csv2sql = async (csv: string, options: Options) => {
+const csvToSql = async (csv: string, options: Options) => {
   const tableName = options.tableName;
   const inferUnique = !!options.inferUnique;
   const createTable = !!options.createTable;
@@ -31,14 +28,14 @@ const csv2sql = async (csv: string, options: Options) => {
   const columnNames = Object.keys(json[0]);
 
   // order values by column name
-  const columns: ColumsUntyped = json.reduce((prev: any, curr: any) => {
+  const columns: UntypedColumns = json.reduce((prev: any, curr: any) => {
     Object.keys(curr).forEach((key: string) => {
       prev[key] = [...(prev[key] ?? [curr[key]]), curr[key]];
     });
     return prev;
   }, {});
 
-  const columnTypes = inferTypeFromData(columns);
+  const columnTypes = inferTypeFromData(columns, new SqliteMapper());
   const columnUnique = inferUnique ? inferUniqueness(columns) : {};
   const columnNullable = inferNullity(columns);
 
@@ -73,4 +70,4 @@ const csv2sql = async (csv: string, options: Options) => {
   return query;
 };
 
-export { csv2sql };
+export { csvToSql, csvToSql as csv2sql };
