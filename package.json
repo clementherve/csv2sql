@@ -1,6 +1,6 @@
 {
   "name": "@clement-herve/csv-to-sql",
-  "version": "0.0.2-alpha",
+  "version": "0.0.1-alpha",
   "description": "Create a SQL table from CSV using Node.js",
   "main": "out/src/index.js",
   "type": "module",
