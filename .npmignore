@@ -1,0 +1,8 @@
+/tests
+/example
+/.vscode
+.editorconfig
+tsconfig.json
+tsconfig.prod.json
+jest.config.ts
+/src
