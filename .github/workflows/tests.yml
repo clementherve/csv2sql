@@ -1,4 +1,4 @@
-name: Run tests with Jest
+name: Tests
 
 on: [push, pull_request]
 jobs:
