@@ -1,0 +1,13 @@
+/tests
+/example
+/.vscode
+/coverage
+/src
+/out/jest.config.d.ts
+/out/jest.config.js
+/.github
+.editorconfig
+.prettierrc
+tsconfig.json
+tsconfig.prod.json
+jest.config.ts

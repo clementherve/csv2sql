@@ -1,5 +1,5 @@
-import { escapeQuote } from '../helpers/escape-quote';
-import { TypedColumns } from '../inference/type-inference';
+import { escapeQuote } from '../helpers/escape-quote.js';
+import { TypedColumns } from '../inference/type-inference.js';
 
 /**
  * Generate the header row (A, B, C).
@@ -14,7 +14,7 @@ const generateColumnNamesTuple = (columnsNames: string[]) => {
 const generateColumnValuesTuple = (row: Map<string, any>, columnsTypes: TypedColumns) => {
   const types = Object.values(columnsTypes);
 
-  // todo: fixme -> specific to mssql
+  // todo: fixme -> specific to sqlite
   return `\t(${Object.values(row)
     .reduce((p: string, c: string, i: number) => {
       if (types[i] === 'int' || types[i] === 'double') {

@@ -1,6 +1,6 @@
-import { NullableColumns } from '../inference/nullity-inference';
-import { TypedColumns } from '../inference/type-inference';
-import { UniqueColumns } from '../inference/uniqueness-inference';
+import { NullableColumns } from '../inference/nullity-inference.js';
+import { TypedColumns } from '../inference/type-inference.js';
+import { UniqueColumns } from '../inference/uniqueness-inference.js';
 
 type Options = {
   tableName: string;

@@ -1,21 +1,24 @@
 {
-  "name": "csv2sql",
-  "version": "0.0.1-test",
+  "name": "@clement-herve/csv-to-sql",
+  "version": "0.0.3-alpha",
   "description": "Create a SQL table from CSV using Node.js",
-  "main": "out/src/cli.js",
+  "main": "out/src/index.js",
+  "type": "module",
   "scripts": {
     "build:watch": "npx tsc --watch -b tsconfig.json",
-    "build:prod": "npx tsc -b tsconfig.prod.json",
+    "build:prod": "npx tsc -b tsconfig.prod.json --declaration",
     "tests": "jest",
-    "tests:watch": "jest --onlyChanged --coverage --watch",
-    "tests:leaks": "jest --onlyChanged --detectLeaks --coverage --watch"
+    "tests:watch": "jest --onlyChanged --coverage --watch"
+  },
+  "bin": {
+    "csv2sql": "out/src/cli.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/clementherve/csv2sql.git"
   },
-  "author": "Clement Herve",
-  "license": "MIT License",
+  "author": "Clément Hervé",
+  "license": "MIT",
   "dependencies": {
     "argparse": "^2.0.1",
     "chalk": "^5.3.0",
@@ -29,5 +32,15 @@
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
-  }
+  },
+  "types": "./out/src/index.d.ts",
+  "bugs": {
+    "url": "https://github.com/clementherve/csv2sql/issues"
+  },
+  "homepage": "https://github.com/clementherve/csv2sql#readme",
+  "keywords": [
+    "csv",
+    "sql",
+    "transform"
+  ]
 }

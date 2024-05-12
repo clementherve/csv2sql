@@ -1,10 +1,11 @@
 import type { JestConfigWithTsJest } from 'ts-jest';
-import { jsWithTsESM as tsjPreset } from 'ts-jest/presets';
 
 const jestConfig: JestConfigWithTsJest = {
-  preset: 'ts-jest',
   transform: {
-    ...tsjPreset.transform,
+    '\\.[jt]s$': 'ts-jest',
+  },
+  moduleNameMapper: {
+    '(.+)\\.js': '$1',
   },
   testPathIgnorePatterns: ['out'],
 };

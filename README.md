@@ -1,6 +1,7 @@
 ![CodeQL](https://github.com/clementherve/csv2sql/actions/workflows/codeql.yml/badge.svg)
+![Jest](https://github.com/clementherve/csv2sql/actions/workflows/run-tests.yml/badge.svg)
 
-# CSV2SQL
+# CSV-TO-SQL
 
 Create a MySQL table from any CSV using javascript.
 
@@ -9,13 +10,15 @@ Create a MySQL table from any CSV using javascript.
 ```bash
     git clone https://github.com/clementherve/csv2sql.git
     pnpm i
-    npm run build
+    pnpm build:watch
 ```
 
 ### Testing
 
 ```
-    npm run tests
+    pnpm tests
+    # or
+    pnpm run tests:watch
 ```
 
 ## Usage
@@ -24,8 +27,6 @@ Run the following command and the SQL file should be generated.
 
 ```bash
     node ./out/src/cli.js <csv file>
-    # or
-    bun ./src/cli.ts
 ```
 
 ### Example
