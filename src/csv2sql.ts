@@ -1,10 +1,10 @@
 import csvToJSON from 'csvtojson';
-import { createTableQuery } from './create/table';
-import { inferTypeFromData, UntypedColumns } from './inference/type-inference';
-import { inferUniqueness } from './inference/uniqueness-inference';
-import { inferNullity } from './inference/nullity-inference';
-import { createMultipleInsertQuery, createSingleInsertQuery } from './create/insert';
-import SqliteMapper from './mapper/sqlite-mapper';
+import { createTableQuery } from './create/table.js';
+import { inferTypeFromData, UntypedColumns } from './inference/type-inference.js';
+import { inferUniqueness } from './inference/uniqueness-inference.js';
+import { inferNullity } from './inference/nullity-inference.js';
+import { createMultipleInsertQuery, createSingleInsertQuery } from './create/insert.js';
+import SqliteMapper from './mapper/sqlite-mapper.js';
 
 type Options = {
   tableName: string;

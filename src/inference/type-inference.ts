@@ -1,4 +1,4 @@
-import { GenericMapperInterface, SpecificMapperInterface } from '../mapper/generic-mapper';
+import { GenericMapperInterface, SpecificMapperInterface } from '../mapper/generic-mapper.js';
 
 export type TypedColumns = Record<string, string | undefined>;
 export type UntypedColumns = Record<string, string[]>;

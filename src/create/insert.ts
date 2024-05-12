@@ -1,5 +1,5 @@
-import { escapeQuote } from '../helpers/escape-quote';
-import { TypedColumns } from '../inference/type-inference';
+import { escapeQuote } from '../helpers/escape-quote.js';
+import { TypedColumns } from '../inference/type-inference.js';
 
 /**
  * Generate the header row (A, B, C).

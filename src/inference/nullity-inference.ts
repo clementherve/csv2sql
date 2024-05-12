@@ -1,4 +1,4 @@
-import { UntypedColumns } from './type-inference';
+import { UntypedColumns } from './type-inference.js';
 
 type ColumnName = string;
 

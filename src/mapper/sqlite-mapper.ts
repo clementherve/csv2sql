@@ -1,5 +1,5 @@
-import { escapeQuote } from '../helpers/escape-quote';
-import GenericMapper, { SpecificMapperInterface } from './generic-mapper';
+import { escapeQuote } from '../helpers/escape-quote.js';
+import GenericMapper, { SpecificMapperInterface } from './generic-mapper.js';
 
 type SqliteTypes = 'tinyint' | 'int' | 'double' | 'text';
 
