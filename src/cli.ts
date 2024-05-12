@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import chalk from 'chalk';
 import fs from 'fs';
 import { csv2sql } from './csv2sql';
