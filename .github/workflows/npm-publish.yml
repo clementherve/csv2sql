@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: 20
       - run: npm i
-      - run: npm build:prod
+      - run: npm run build:prod
       - run: npm run tests
 
   publish-npm:
