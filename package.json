@@ -11,7 +11,7 @@
     "tests:watch": "jest --onlyChanged --coverage --watch"
   },
   "bin": {
-    "csv2sql": "./out/src/cli.js"
+    "csv2sql": "out/src/cli.js"
   },
   "repository": {
     "type": "git",
